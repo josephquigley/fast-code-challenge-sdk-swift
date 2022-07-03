@@ -21,7 +21,7 @@ import Foundation
 import FastCodeChallenge
 
 let sema = DispatchSemaphore(value: 0)
-let fastCode = FastCode(token: "MyToken") // Available from https://fastcode.rocks/profile when you create an account
+let fastCode = FastCode(token: "d26049a7-1120-4bf7-9299-d82bdd62baba")
 fastCode.solve(problemId: "d1e13528-d5d3-494b-beed-be83645f09e4",
                onError: {
     fatalError($0.localizedDescription)
@@ -33,14 +33,25 @@ fastCode.solve(problemId: "d1e13528-d5d3-494b-beed-be83645f09e4",
                problemTask: { data -> Int in
     let jsonStruct = try! JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed)
     
-    if let dict = jsonStruct as? [String: Any] {
-        return dict.count
-    } else if let array = jsonStruct as? [Any] {
-        return array.count
-    } else {
-        return 1
-    }
+    return countPrimitives(for: jsonStruct)
 })
 
 sema.wait()
+
+func countPrimitives(for object: Any) -> Int {
+    var sum = 0
+    
+    if let dict = object as? [String: Any] {
+        for value in dict.values {
+            sum += countPrimitives(for: value)
+        }
+    } else if let array = object as? [Any] {
+        for value in array {
+            sum += countPrimitives(for: value)
+        }
+    } else {
+        sum += 1
+    }
+    return sum
+}
 ```
