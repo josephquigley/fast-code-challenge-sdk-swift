@@ -10,11 +10,17 @@ public protocol FastCodeBackendTask {
 
 public enum FastCodeError: LocalizedError {
     case unknown
+    case invalidToken
+    case unknownWithMessage(String)
     
     public var errorDescription: String? {
         switch self {
         case .unknown:
             return "Unknown error"
+        case .unknownWithMessage(let message):
+            return message
+        case .invalidToken:
+            return "Invalid token"
         }
     }
     

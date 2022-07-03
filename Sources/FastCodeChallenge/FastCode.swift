@@ -9,7 +9,7 @@ public struct FastCode {
     
     public typealias FastCodeResult = (Data?, Error?) -> Void
     public let token: String
-    public let backend: FastCodeBackend
+    internal let backend: FastCodeBackend
     
     private static let baseUrl = URL(string: "https://fastcode.rocks/fast/data")!
     private let decoder = JSONDecoder()
@@ -114,13 +114,24 @@ public struct FastCode {
                 task(nil, error)
                 return
             }
-            guard let httpResponse = response as? HTTPURLResponse,
-                  (200...299).contains(httpResponse.statusCode),
-                    let data = data else {
+            guard let httpResponse = response as? HTTPURLResponse, let data = data else {
+                task(nil, FastCodeError.unknown)
                 return
             }
             
-            task(data, nil)
+            if (200...299).contains(httpResponse.statusCode) {
+                task(data, nil)
+            }
+            
+            if httpResponse.statusCode >= 400 {
+                if httpResponse.statusCode == 400 {
+                    task(nil, FastCodeError.invalidToken)
+                } else if let message = String(data: data, encoding: .utf8) {
+                    task(nil, FastCodeError.unknownWithMessage(message))
+                } else {
+                    task(nil, FastCodeError.unknown)
+                }
+            }
         }
         urlTask.resume()
     }
