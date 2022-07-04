@@ -21,7 +21,7 @@ import Foundation
 import FastCodeChallenge
 
 let sema = DispatchSemaphore(value: 0)
-let fastCode = FastCode(token: "d26049a7-1120-4bf7-9299-d82bdd62baba")
+let fastCode = FastCode(token: "d26049a7-1120-4bf7-9299-d82bdd62baba") // Token can be acquired from https://fastcode.rocks/profile
 fastCode.solve(problemId: "d1e13528-d5d3-494b-beed-be83645f09e4",
                onError: {
     fatalError($0.localizedDescription)
